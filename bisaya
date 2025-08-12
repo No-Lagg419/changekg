@@ -1,0 +1,143 @@
+-- Put this LocalScript in StarterPlayerScripts
+
+-- CONFIG:
+local NEW_KG = 50 -- change to default new KG you want after clicking button
+local LOADING_TIME = 2 -- seconds to "load"
+
+-- GUI Creation
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "PetKGChanger"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 250, 0, 160)
+Frame.Position = UDim2.new(0.5, -125, 0.5, -80)
+Frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = Frame
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.FillDirection = Enum.FillDirection.Vertical
+UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Top
+UIListLayout.Parent = Frame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Text = "Pet KG Changer"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 18
+Title.Parent = Frame
+
+-- Labels
+local PetNameLabel = Instance.new("TextLabel")
+PetNameLabel.Size = UDim2.new(1, -20, 0, 20)
+PetNameLabel.Text = "Pet Name: None"
+PetNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+PetNameLabel.BackgroundTransparency = 1
+PetNameLabel.Font = Enum.Font.Gotham
+PetNameLabel.TextSize = 14
+PetNameLabel.Parent = Frame
+
+local OldKgLabel = Instance.new("TextLabel")
+OldKgLabel.Size = UDim2.new(1, -20, 0, 20)
+OldKgLabel.Text = "Old Kg: 0"
+OldKgLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+OldKgLabel.BackgroundTransparency = 1
+OldKgLabel.Font = Enum.Font.Gotham
+OldKgLabel.TextSize = 14
+OldKgLabel.Parent = Frame
+
+local NewKgLabel = Instance.new("TextLabel")
+NewKgLabel.Size = UDim2.new(1, -20, 0, 20)
+NewKgLabel.Text = "New Kg: 0"
+NewKgLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+NewKgLabel.BackgroundTransparency = 1
+NewKgLabel.Font = Enum.Font.Gotham
+NewKgLabel.TextSize = 14
+NewKgLabel.Parent = Frame
+
+-- Change Button
+local ChangeButton = Instance.new("TextButton")
+ChangeButton.Size = UDim2.new(0.8, 0, 0, 30)
+ChangeButton.Text = "Change KG"
+ChangeButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+ChangeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ChangeButton.Font = Enum.Font.GothamBold
+ChangeButton.TextSize = 14
+ChangeButton.Parent = Frame
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 5)
+BtnCorner.Parent = ChangeButton
+
+-- Function to change KG visually
+local function changePetKG()
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local pet = nil
+
+    -- Try to find pet in workspace (adjust path if needed)
+    for _, obj in ipairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and obj:FindFirstChild("Owner") and obj.Owner.Value == player then
+            pet = obj
+            break
+        end
+    end
+
+    if not pet then
+        warn("No pet found for player")
+        return
+    end
+
+    -- Update labels
+    PetNameLabel.Text = "Pet Name: " .. pet.Name
+    local oldKG = math.random(5, 20) -- Replace with actual pet KG if available
+    OldKgLabel.Text = "Old Kg: " .. oldKG
+    NewKgLabel.Text = "New Kg: Loading..."
+
+    -- Loading animation
+    ChangeButton.Text = "Loading..."
+    ChangeButton.Active = false
+    task.wait(LOADING_TIME)
+
+    -- Apply new KG visually
+    NewKgLabel.Text = "New Kg: " .. NEW_KG
+    pet:SetAttribute("KG", NEW_KG) -- just a local attribute
+    pet:SetPrimaryPartCFrame(pet.PrimaryPart.CFrame) -- refresh position
+    pet.PrimaryPart.Size = Vector3.new(NEW_KG / 10, NEW_KG / 10, NEW_KG / 10)
+
+    -- BillboardGui above pet
+    local billboard = pet:FindFirstChild("PetBillboard") or Instance.new("BillboardGui")
+    billboard.Name = "PetBillboard"
+    billboard.Size = UDim2.new(0, 200, 0, 50)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = pet.PrimaryPart
+
+    local label = billboard:FindFirstChild("KGLabel") or Instance.new("TextLabel")
+    label.Name = "KGLabel"
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextScaled = true
+    label.Parent = billboard
+    label.Text = pet.Name .. " - " .. NEW_KG .. " Kg"
+
+    -- Reset button
+    ChangeButton.Text = "Change KG"
+    ChangeButton.Active = true
+end
+
+ChangeButton.MouseButton1Click:Connect(changePetKG)
