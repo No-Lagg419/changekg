@@ -1,156 +1,145 @@
--- Pet KG Changer (Visual Only) - Grow a Garden Theme
--- Made for mobile + PC
+-- 🐾 Pet Changer KG - Mobile Friendly Version
+-- By ChatGPT
 
-local TOGGLE_KEY = Enum.KeyCode.RightControl -- desktop toggle
-local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui")
-gui.Name = "PetKGChanger"
-gui.Parent = player:WaitForChild("PlayerGui")
-gui.ResetOnSpawn = false
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
 
--- Main Frame
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 320, 0, 280)
-mainFrame.Position = UDim2.new(0.5, -160, 0.5, -140)
-mainFrame.BackgroundColor3 = Color3.fromRGB(198, 239, 206) -- soft green
-mainFrame.BorderSizePixel = 0
-mainFrame.Visible = true
-mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-mainFrame.Parent = gui
-mainFrame.Active = true
-mainFrame.Draggable = true
+-- 📜 Updated Pet List (Optimized in one line)
+local petList = {
+    "Bunny","Dog","Golden Lab","Starfish","Crab","Seagull","Bagel Bunny","Bee","Sunny-Side Chicken","Bacon Pig","Flamingo","Toucan","Sea Turtle",
+    "Orangutan","Seal","Honey Bee","Wasp","Pancake Mole","Grey Mouse","Tarantula Hawk","Caterpillar","Snail","Petal Bee","Moth","Scarlet Macaw",
+    "Ostrich","Peacock","Capybara","Gorilla Chef","Hotdog Daschund","Sushi Bear","Brown Mouse","Giant Ant","Praying Mantis","Red Giant Ant",
+    "Squirrel","Bear Bee","Butterfly","Pack Bee","Mimic Octopus","Red Fox","Dragonfly","Disco Bee","Queen Bee","French Fry Ferret","Lobster Thermidor",
+    "Raccoon"
+}
 
--- UI Corner
-local corner = Instance.new("UICorner", mainFrame)
-corner.CornerRadius = UDim.new(0, 16)
+-- 🖥 GUI Creation
+local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.ResetOnSpawn = false
+
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 250, 0, 220)
+Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BackgroundTransparency = 0.1
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
 
 -- Title
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
-title.BackgroundTransparency = 1
-title.Text = "PET KG CHANGER"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-title.TextColor3 = Color3.fromRGB(34, 85, 34)
-title.Parent = mainFrame
+local Title = Instance.new("TextLabel", Frame)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundTransparency = 1
+Title.Text = "Pet Changer KG"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
 
--- UI Layout
-local listLayout = Instance.new("UIListLayout", mainFrame)
-listLayout.Padding = UDim.new(0, 6)
-listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-listLayout.SortOrder = Enum.SortOrder.LayoutOrder
+-- Search Box
+local SearchBox = Instance.new("TextBox", Frame)
+SearchBox.Size = UDim2.new(1, -10, 0, 25)
+SearchBox.Position = UDim2.new(0, 5, 0, 35)
+SearchBox.PlaceholderText = "Search Pet..."
+SearchBox.Text = ""
+SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+SearchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SearchBox.BorderSizePixel = 0
+SearchBox.Font = Enum.Font.Gotham
+SearchBox.TextSize = 14
 
--- Spacer for title
-Instance.new("Frame", mainFrame).Size = UDim2.new(1,0,0,0)
+-- Pet List (ScrollingFrame)
+local PetListFrame = Instance.new("ScrollingFrame", Frame)
+PetListFrame.Size = UDim2.new(1, -10, 0, 100)
+PetListFrame.Position = UDim2.new(0, 5, 0, 65)
+PetListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+PetListFrame.BackgroundTransparency = 1
+PetListFrame.BorderSizePixel = 0
+PetListFrame.ScrollBarThickness = 4
+PetListFrame.Visible = false -- hidden until search
 
--- Function to create TextBox
-local function createTextBox(placeholder)
-    local box = Instance.new("TextBox")
-    box.Size = UDim2.new(0.9, 0, 0, 30)
-    box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    box.PlaceholderText = placeholder
-    box.Font = Enum.Font.Gotham
-    box.TextSize = 16
-    box.Text = ""
-    box.TextColor3 = Color3.fromRGB(0, 0, 0)
-    box.ClearTextOnFocus = false
-    box.Parent = mainFrame
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 8)
-    return box
-end
+-- KG Box
+local KgBox = Instance.new("TextBox", Frame)
+KgBox.Size = UDim2.new(1, -10, 0, 25)
+KgBox.Position = UDim2.new(0, 5, 0, 170)
+KgBox.PlaceholderText = "Enter KG..."
+KgBox.Text = ""
+KgBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KgBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+KgBox.BorderSizePixel = 0
+KgBox.Font = Enum.Font.Gotham
+KgBox.TextSize = 14
 
--- Inputs
-local petNameBox = createTextBox("Pet Name")
-local oldKGBox = createTextBox("Old KG")
-local newKGBox = createTextBox("New KG")
+-- Apply Button
+local ApplyButton = Instance.new("TextButton", Frame)
+ApplyButton.Size = UDim2.new(1, -10, 0, 25)
+ApplyButton.Position = UDim2.new(0, 5, 0, 200)
+ApplyButton.Text = "Apply Size"
+ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ApplyButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+ApplyButton.BorderSizePixel = 0
+ApplyButton.Font = Enum.Font.GothamBold
+ApplyButton.TextSize = 14
 
--- Progress Bar Frame
-local progressFrame = Instance.new("Frame")
-progressFrame.Size = UDim2.new(0.9, 0, 0, 20)
-progressFrame.BackgroundColor3 = Color3.fromRGB(230, 255, 230)
-progressFrame.Visible = false
-progressFrame.Parent = mainFrame
-Instance.new("UICorner", progressFrame).CornerRadius = UDim.new(0, 8)
+-- Loading Bar
+local LoadingBarBG = Instance.new("Frame", Frame)
+LoadingBarBG.Size = UDim2.new(1, -10, 0, 5)
+LoadingBarBG.Position = UDim2.new(0, 5, 1, -10)
+LoadingBarBG.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+LoadingBarBG.BorderSizePixel = 0
+local LoadingBar = Instance.new("Frame", LoadingBarBG)
+LoadingBar.Size = UDim2.new(0, 0, 1, 0)
+LoadingBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+LoadingBar.BorderSizePixel = 0
 
--- Fill
-local progressFill = Instance.new("Frame")
-progressFill.Size = UDim2.new(0, 0, 1, 0)
-progressFill.BackgroundColor3 = Color3.fromRGB(144, 238, 144)
-progressFill.Parent = progressFrame
-Instance.new("UICorner", progressFill).CornerRadius = UDim.new(0, 8)
+-- 🌟 Functions
+local selectedPet = nil
 
--- Stripe effect
-local stripe = Instance.new("UIGradient", progressFill)
-stripe.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(144, 238, 144)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
-})
-stripe.Rotation = 45
-
--- Buttons
-local function createButton(text, color)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
-    btn.BackgroundColor3 = color
-    btn.Font = Enum.Font.GothamBold
-    btn.TextSize = 16
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Text = text
-    btn.Parent = mainFrame
-    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-    return btn
-end
-
-local updateBtn = createButton("UPDATE KG", Color3.fromRGB(67, 160, 71))
-local resetBtn = createButton("RESET KG", Color3.fromRGB(255, 112, 67))
-
--- Log Label
-local logLabel = Instance.new("TextLabel")
-logLabel.Size = UDim2.new(0.9, 0, 0, 30)
-logLabel.BackgroundTransparency = 1
-logLabel.Font = Enum.Font.Gotham
-logLabel.TextSize = 14
-logLabel.TextColor3 = Color3.fromRGB(50, 50, 50)
-logLabel.Text = ""
-logLabel.Parent = mainFrame
-
--- Update Function
-local function startUpdate()
-    if petNameBox.Text == "" or oldKGBox.Text == "" or newKGBox.Text == "" then
-        logLabel.Text = "Please fill all fields."
+local function refreshPetList(searchText)
+    for _, child in ipairs(PetListFrame:GetChildren()) do
+        if child:IsA("TextButton") then child:Destroy() end
+    end
+    if searchText == "" then
+        PetListFrame.Visible = false
         return
     end
-    
-    progressFrame.Visible = true
-    progressFill.Size = UDim2.new(0, 0, 1, 0)
-    logLabel.Text = "Updating KG..."
-    
-    -- Animate progress bar
-    for i = 0, 1, 0.02 do
-        progressFill.Size = UDim2.new(i, 0, 1, 0)
-        stripe.Offset = Vector2.new(i*2, 0)
-        task.wait(0.02)
+    PetListFrame.Visible = true
+    local yPos = 0
+    for _, pet in ipairs(petList) do
+        if string.find(string.lower(pet), string.lower(searchText)) then
+            local PetButton = Instance.new("TextButton", PetListFrame)
+            PetButton.Size = UDim2.new(1, 0, 0, 20)
+            PetButton.Position = UDim2.new(0, 0, 0, yPos)
+            PetButton.Text = pet
+            PetButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            PetButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            PetButton.Font = Enum.Font.Gotham
+            PetButton.TextSize = 12
+            PetButton.MouseButton1Click:Connect(function()
+                selectedPet = pet
+                SearchBox.Text = pet
+                PetListFrame.Visible = false
+            end)
+            yPos = yPos + 22
+        end
     end
-    
-    logLabel.Text = petNameBox.Text .. ": " .. oldKGBox.Text .. " KG → " .. newKGBox.Text .. " KG"
-    progressFrame.Visible = false
+    PetListFrame.CanvasSize = UDim2.new(0, 0, 0, yPos)
 end
 
--- Reset Function
-local function resetFields()
-    petNameBox.Text = ""
-    oldKGBox.Text = ""
-    newKGBox.Text = ""
-    logLabel.Text = ""
-end
+SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+    refreshPetList(SearchBox.Text)
+end)
 
-updateBtn.MouseButton1Click:Connect(startUpdate)
-resetBtn.MouseButton1Click:Connect(resetFields)
-
--- Desktop toggle
-game:GetService("UserInputService").InputBegan:Connect(function(input, gp)
-    if not gp and input.KeyCode == TOGGLE_KEY then
-        mainFrame.Visible = not mainFrame.Visible
+ApplyButton.MouseButton1Click:Connect(function()
+    if not selectedPet or KgBox.Text == "" then return end
+    LoadingBar.Size = UDim2.new(0, 0, 1, 0)
+    TweenService:Create(LoadingBar, TweenInfo.new(1), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+    task.wait(1)
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj.Name == selectedPet and obj:IsA("Model") then
+            obj:SetPrimaryPartCFrame(obj.PrimaryPart.CFrame) -- refresh pos
+            obj.PrimaryPart.Size = Vector3.new(tonumber(KgBox.Text), tonumber(KgBox.Text), tonumber(KgBox.Text))
+        end
     end
 end)
