@@ -1,171 +1,156 @@
--- LocalScript inside StarterPlayerScripts or StarterGui
+-- Pet KG Changer (Visual Only) - Grow a Garden Theme
+-- Made for mobile + PC
 
--- Main GUI
-local Player = game.Players.LocalPlayer
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "ChangePetKGGui"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = Player:WaitForChild("PlayerGui")
+local TOGGLE_KEY = Enum.KeyCode.RightControl -- desktop toggle
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "PetKGChanger"
+gui.Parent = player:WaitForChild("PlayerGui")
+gui.ResetOnSpawn = false
 
 -- Main Frame
-local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 320, 0, 260)
-Frame.Position = UDim2.new(0.5, -160, 0.5, -130)
-Frame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-Frame.BorderSizePixel = 0
-Frame.Active = true
-Frame.Draggable = true
-Frame.Parent = ScreenGui
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 320, 0, 280)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -140)
+mainFrame.BackgroundColor3 = Color3.fromRGB(198, 239, 206) -- soft green
+mainFrame.BorderSizePixel = 0
+mainFrame.Visible = true
+mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+mainFrame.Parent = gui
+mainFrame.Active = true
+mainFrame.Draggable = true
 
--- UI Stroke (border)
-local Stroke = Instance.new("UIStroke")
-Stroke.Thickness = 1.5
-Stroke.Color = Color3.fromRGB(80, 80, 80)
-Stroke.Parent = Frame
+-- UI Corner
+local corner = Instance.new("UICorner", mainFrame)
+corner.CornerRadius = UDim.new(0, 16)
 
 -- Title
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 40)
-Title.BackgroundTransparency = 1
-Title.Text = "CHANGE PET KG"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 20
-Title.Parent = Frame
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "PET KG CHANGER"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(34, 85, 34)
+title.Parent = mainFrame
 
--- Function to create label + textbox
-local function CreateInput(yPos, labelText)
-    local Label = Instance.new("TextLabel")
-    Label.Position = UDim2.new(0, 10, 0, yPos)
-    Label.Size = UDim2.new(0, 300, 0, 20)
-    Label.BackgroundTransparency = 1
-    Label.Text = labelText
-    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Label.Font = Enum.Font.Gotham
-    Label.TextSize = 16
-    Label.TextXAlignment = Enum.TextXAlignment.Left
-    Label.Parent = Frame
+-- UI Layout
+local listLayout = Instance.new("UIListLayout", mainFrame)
+listLayout.Padding = UDim.new(0, 6)
+listLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+listLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-    local TextBox = Instance.new("TextBox")
-    TextBox.Position = UDim2.new(0, 10, 0, yPos + 22)
-    TextBox.Size = UDim2.new(0, 300, 0, 25)
-    TextBox.BackgroundTransparency = 0.2
-    TextBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TextBox.Font = Enum.Font.Gotham
-    TextBox.TextSize = 16
-    TextBox.ClearTextOnFocus = false
-    TextBox.PlaceholderText = "Type here..."
-    TextBox.Parent = Frame
+-- Spacer for title
+Instance.new("Frame", mainFrame).Size = UDim2.new(1,0,0,0)
 
-    local boxStroke = Instance.new("UIStroke")
-    boxStroke.Thickness = 1
-    boxStroke.Color = Color3.fromRGB(80, 80, 80)
-    boxStroke.Parent = TextBox
-
-    return TextBox
+-- Function to create TextBox
+local function createTextBox(placeholder)
+    local box = Instance.new("TextBox")
+    box.Size = UDim2.new(0.9, 0, 0, 30)
+    box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    box.PlaceholderText = placeholder
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 16
+    box.Text = ""
+    box.TextColor3 = Color3.fromRGB(0, 0, 0)
+    box.ClearTextOnFocus = false
+    box.Parent = mainFrame
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 8)
+    return box
 end
 
-local PetNameBox = CreateInput(50, "Pet Name:")
-local OldKGBox = CreateInput(100, "Old KG:")
-local NewKGBox = CreateInput(150, "New KG:")
+-- Inputs
+local petNameBox = createTextBox("Pet Name")
+local oldKGBox = createTextBox("Old KG")
+local newKGBox = createTextBox("New KG")
 
--- Change button
-local ChangeBtn = Instance.new("TextButton")
-ChangeBtn.Size = UDim2.new(0, 300, 0, 30)
-ChangeBtn.Position = UDim2.new(0, 10, 0, 200)
-ChangeBtn.BackgroundColor3 = Color3.fromRGB(60, 120, 255)
-ChangeBtn.Text = "Change KG"
-ChangeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ChangeBtn.Font = Enum.Font.GothamBold
-ChangeBtn.TextSize = 16
-ChangeBtn.Parent = Frame
+-- Progress Bar Frame
+local progressFrame = Instance.new("Frame")
+progressFrame.Size = UDim2.new(0.9, 0, 0, 20)
+progressFrame.BackgroundColor3 = Color3.fromRGB(230, 255, 230)
+progressFrame.Visible = false
+progressFrame.Parent = mainFrame
+Instance.new("UICorner", progressFrame).CornerRadius = UDim.new(0, 8)
 
--- Loading label
-local LoadingLabel = Instance.new("TextLabel")
-LoadingLabel.Size = UDim2.new(1, 0, 0, 25)
-LoadingLabel.Position = UDim2.new(0, 0, 1, 8)
-LoadingLabel.BackgroundTransparency = 1
-LoadingLabel.Text = ""
-LoadingLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-LoadingLabel.Font = Enum.Font.Gotham
-LoadingLabel.TextSize = 14
-LoadingLabel.TextXAlignment = Enum.TextXAlignment.Center
-LoadingLabel.TextYAlignment = Enum.TextYAlignment.Center
-LoadingLabel.Parent = Frame
+-- Fill
+local progressFill = Instance.new("Frame")
+progressFill.Size = UDim2.new(0, 0, 1, 0)
+progressFill.BackgroundColor3 = Color3.fromRGB(144, 238, 144)
+progressFill.Parent = progressFrame
+Instance.new("UICorner", progressFill).CornerRadius = UDim.new(0, 8)
 
--- Tween service
-local TweenService = game:GetService("TweenService")
+-- Stripe effect
+local stripe = Instance.new("UIGradient", progressFill)
+stripe.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(144, 238, 144)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+})
+stripe.Rotation = 45
 
--- Loading animation with progress bar + success fade
-local function ShowLoading()
-    -- Progress bar background
-    local ProgressBarBG = Instance.new("Frame")
-    ProgressBarBG.Size = UDim2.new(0, 300, 0, 6)
-    ProgressBarBG.Position = UDim2.new(0, 10, 0, 235)
-    ProgressBarBG.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    ProgressBarBG.BorderSizePixel = 0
-    ProgressBarBG.Parent = Frame
+-- Buttons
+local function createButton(text, color)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.BackgroundColor3 = color
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 16
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Text = text
+    btn.Parent = mainFrame
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
+    return btn
+end
 
-    local ProgressFill = Instance.new("Frame")
-    ProgressFill.Size = UDim2.new(0, 0, 1, 0)
-    ProgressFill.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-    ProgressFill.BorderSizePixel = 0
-    ProgressFill.Parent = ProgressBarBG
+local updateBtn = createButton("UPDATE KG", Color3.fromRGB(67, 160, 71))
+local resetBtn = createButton("RESET KG", Color3.fromRGB(255, 112, 67))
 
-    local info = TweenInfo.new(2.4, Enum.EasingStyle.Linear)
+-- Log Label
+local logLabel = Instance.new("TextLabel")
+logLabel.Size = UDim2.new(0.9, 0, 0, 30)
+logLabel.BackgroundTransparency = 1
+logLabel.Font = Enum.Font.Gotham
+logLabel.TextSize = 14
+logLabel.TextColor3 = Color3.fromRGB(50, 50, 50)
+logLabel.Text = ""
+logLabel.Parent = mainFrame
 
-    -- Animate fill bar
-    TweenService:Create(ProgressFill, info, { Size = UDim2.new(1, 0, 1, 0) }):Play()
-
-    -- Animate dots during progress
-    local counter = 0
-    while counter < 6 do
-        local dots = string.rep(".", (counter % 3) + 1)
-        LoadingLabel.Text = "Changing KG" .. dots
-        LoadingLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-        LoadingLabel.Font = Enum.Font.Gotham
-        LoadingLabel.TextSize = 14
-        LoadingLabel.TextTransparency = 0
-        counter += 1
-        task.wait(0.4)
+-- Update Function
+local function startUpdate()
+    if petNameBox.Text == "" or oldKGBox.Text == "" or newKGBox.Text == "" then
+        logLabel.Text = "Please fill all fields."
+        return
     end
-
-    -- Success state (bigger, bold, green, fade in/out)
-    ProgressFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-    LoadingLabel.Text = "KG Changed"
-    LoadingLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-    LoadingLabel.Font = Enum.Font.GothamBold
-    LoadingLabel.TextSize = 18
-    LoadingLabel.TextTransparency = 1
-
-    -- Fade in
-    TweenService:Create(LoadingLabel, TweenInfo.new(0.4), {TextTransparency = 0}):Play()
-    task.wait(1)
-    -- Fade out
-    TweenService:Create(LoadingLabel, TweenInfo.new(0.4), {TextTransparency = 1}):Play()
-    task.wait(0.4)
-
-    -- Reset
-    LoadingLabel.Text = ""
-    LoadingLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-    LoadingLabel.Font = Enum.Font.Gotham
-    LoadingLabel.TextSize = 14
-    ProgressBarBG:Destroy()
+    
+    progressFrame.Visible = true
+    progressFill.Size = UDim2.new(0, 0, 1, 0)
+    logLabel.Text = "Updating KG..."
+    
+    -- Animate progress bar
+    for i = 0, 1, 0.02 do
+        progressFill.Size = UDim2.new(i, 0, 1, 0)
+        stripe.Offset = Vector2.new(i*2, 0)
+        task.wait(0.02)
+    end
+    
+    logLabel.Text = petNameBox.Text .. ": " .. oldKGBox.Text .. " KG → " .. newKGBox.Text .. " KG"
+    progressFrame.Visible = false
 end
 
--- Button click
-ChangeBtn.MouseButton1Click:Connect(function()
-    if PetNameBox.Text ~= "" and OldKGBox.Text ~= "" and NewKGBox.Text ~= "" then
-        task.spawn(ShowLoading)
-        print("Pet Name:", PetNameBox.Text)
-        print("Old KG:", OldKGBox.Text)
-        print("New KG:", NewKGBox.Text)
-    else
-        LoadingLabel.Text = "Please fill all fields!"
-        LoadingLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
-        task.wait(1.2)
-        LoadingLabel.Text = ""
-        LoadingLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+-- Reset Function
+local function resetFields()
+    petNameBox.Text = ""
+    oldKGBox.Text = ""
+    newKGBox.Text = ""
+    logLabel.Text = ""
+end
+
+updateBtn.MouseButton1Click:Connect(startUpdate)
+resetBtn.MouseButton1Click:Connect(resetFields)
+
+-- Desktop toggle
+game:GetService("UserInputService").InputBegan:Connect(function(input, gp)
+    if not gp and input.KeyCode == TOGGLE_KEY then
+        mainFrame.Visible = not mainFrame.Visible
     end
 end)
