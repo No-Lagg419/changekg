@@ -1,4 +1,4 @@
--- 🐾 Pet Changer KG - Mobile Friendly Version
+-- 🐾 Pet Changer KG - Compact Version
 -- By ChatGPT
 
 local Players = game:GetService("Players")
@@ -6,7 +6,7 @@ local Workspace = game:GetService("Workspace")
 local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 
--- 📜 Updated Pet List (Optimized in one line)
+-- 📜 Pet List
 local petList = {
     "Bunny","Dog","Golden Lab","Starfish","Crab","Seagull","Bagel Bunny","Bee","Sunny-Side Chicken","Bacon Pig","Flamingo","Toucan","Sea Turtle",
     "Orangutan","Seal","Honey Bee","Wasp","Pancake Mole","Grey Mouse","Tarantula Hawk","Caterpillar","Snail","Petal Bee","Moth","Scarlet Macaw",
@@ -15,77 +15,77 @@ local petList = {
     "Raccoon"
 }
 
--- 🖥 GUI Creation
+-- 🖥 GUI
 local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
 ScreenGui.ResetOnSpawn = false
 
 local Frame = Instance.new("Frame", ScreenGui)
-Frame.Size = UDim2.new(0, 250, 0, 220)
-Frame.Position = UDim2.new(0.3, 0, 0.3, 0)
-Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Frame.BackgroundTransparency = 0.1
+Frame.Size = UDim2.new(0, 220, 0, 180)
+Frame.Position = UDim2.new(0.35, 0, 0.35, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 Frame.BorderSizePixel = 0
 Frame.Active = true
 Frame.Draggable = true
+Frame.BackgroundTransparency = 0.05
 
 -- Title
 local Title = Instance.new("TextLabel", Frame)
-Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Size = UDim2.new(1, 0, 0, 25)
 Title.BackgroundTransparency = 1
-Title.Text = "Pet Changer KG"
+Title.Text = "🐾 Pet Changer KG"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 16
+Title.TextSize = 15
 
 -- Search Box
 local SearchBox = Instance.new("TextBox", Frame)
-SearchBox.Size = UDim2.new(1, -10, 0, 25)
-SearchBox.Position = UDim2.new(0, 5, 0, 35)
+SearchBox.Size = UDim2.new(1, -10, 0, 22)
+SearchBox.Position = UDim2.new(0, 5, 0, 28)
 SearchBox.PlaceholderText = "Search Pet..."
 SearchBox.Text = ""
 SearchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-SearchBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SearchBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 SearchBox.BorderSizePixel = 0
 SearchBox.Font = Enum.Font.Gotham
-SearchBox.TextSize = 14
+SearchBox.TextSize = 13
 
--- Pet List (ScrollingFrame)
+-- Pet List
 local PetListFrame = Instance.new("ScrollingFrame", Frame)
-PetListFrame.Size = UDim2.new(1, -10, 0, 100)
-PetListFrame.Position = UDim2.new(0, 5, 0, 65)
+PetListFrame.Size = UDim2.new(1, -10, 0, 70)
+PetListFrame.Position = UDim2.new(0, 5, 0, 52)
 PetListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 PetListFrame.BackgroundTransparency = 1
 PetListFrame.BorderSizePixel = 0
-PetListFrame.ScrollBarThickness = 4
-PetListFrame.Visible = false -- hidden until search
+PetListFrame.ScrollBarThickness = 3
+PetListFrame.Visible = false
 
 -- KG Box
 local KgBox = Instance.new("TextBox", Frame)
-KgBox.Size = UDim2.new(1, -10, 0, 25)
-KgBox.Position = UDim2.new(0, 5, 0, 170)
+KgBox.Size = UDim2.new(1, -10, 0, 22)
+KgBox.Position = UDim2.new(0, 5, 0, 125)
 KgBox.PlaceholderText = "Enter KG..."
 KgBox.Text = ""
 KgBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-KgBox.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+KgBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 KgBox.BorderSizePixel = 0
 KgBox.Font = Enum.Font.Gotham
-KgBox.TextSize = 14
+KgBox.TextSize = 13
 
 -- Apply Button
 local ApplyButton = Instance.new("TextButton", Frame)
-ApplyButton.Size = UDim2.new(1, -10, 0, 25)
-ApplyButton.Position = UDim2.new(0, 5, 0, 200)
-ApplyButton.Text = "Apply Size"
+ApplyButton.Size = UDim2.new(1, -10, 0, 24)
+ApplyButton.Position = UDim2.new(0, 5, 0, 150)
+ApplyButton.Text = "Apply"
 ApplyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ApplyButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
 ApplyButton.BorderSizePixel = 0
 ApplyButton.Font = Enum.Font.GothamBold
-ApplyButton.TextSize = 14
+ApplyButton.TextSize = 13
 
 -- Loading Bar
-local LoadingBarBG = Instance.new("Frame", Frame)
-LoadingBarBG.Size = UDim2.new(1, -10, 0, 5)
-LoadingBarBG.Position = UDim2.new(0, 5, 1, -10)
+local LoadingBarBG = Instance.new("Frame", ApplyButton)
+LoadingBarBG.Size = UDim2.new(1, 0, 0, 3)
+LoadingBarBG.Position = UDim2.new(0, 0, 1, 0)
 LoadingBarBG.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 LoadingBarBG.BorderSizePixel = 0
 local LoadingBar = Instance.new("Frame", LoadingBarBG)
@@ -93,9 +93,27 @@ LoadingBar.Size = UDim2.new(0, 0, 1, 0)
 LoadingBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 LoadingBar.BorderSizePixel = 0
 
--- 🌟 Functions
+-- Vars
 local selectedPet = nil
 
+-- Scale Model Function
+local function scaleModel(model, targetSize)
+    if not model.PrimaryPart then return end
+    local currentSize = model.PrimaryPart.Size.X
+    local scaleFactor = targetSize / currentSize
+    local primaryCFrame = model.PrimaryPart.CFrame
+
+    for _, part in ipairs(model:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Size = part.Size * scaleFactor
+        elseif part:IsA("Attachment") then
+            part.Position = part.Position * scaleFactor
+        end
+    end
+    model:SetPrimaryPartCFrame(primaryCFrame)
+end
+
+-- Refresh Pet List
 local function refreshPetList(searchText)
     for _, child in ipairs(PetListFrame:GetChildren()) do
         if child:IsA("TextButton") then child:Destroy() end
@@ -109,11 +127,12 @@ local function refreshPetList(searchText)
     for _, pet in ipairs(petList) do
         if string.find(string.lower(pet), string.lower(searchText)) then
             local PetButton = Instance.new("TextButton", PetListFrame)
-            PetButton.Size = UDim2.new(1, 0, 0, 20)
+            PetButton.Size = UDim2.new(1, 0, 0, 18)
             PetButton.Position = UDim2.new(0, 0, 0, yPos)
             PetButton.Text = pet
             PetButton.TextColor3 = Color3.fromRGB(255, 255, 255)
             PetButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            PetButton.BorderSizePixel = 0
             PetButton.Font = Enum.Font.Gotham
             PetButton.TextSize = 12
             PetButton.MouseButton1Click:Connect(function()
@@ -121,7 +140,7 @@ local function refreshPetList(searchText)
                 SearchBox.Text = pet
                 PetListFrame.Visible = false
             end)
-            yPos = yPos + 22
+            yPos = yPos + 20
         end
     end
     PetListFrame.CanvasSize = UDim2.new(0, 0, 0, yPos)
@@ -131,15 +150,31 @@ SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
     refreshPetList(SearchBox.Text)
 end)
 
+-- Apply Button Logic
 ApplyButton.MouseButton1Click:Connect(function()
     if not selectedPet or KgBox.Text == "" then return end
+    local kg = tonumber(KgBox.Text)
+    if not kg then return end
+
+    -- Loading animation
     LoadingBar.Size = UDim2.new(0, 0, 1, 0)
-    TweenService:Create(LoadingBar, TweenInfo.new(1), {Size = UDim2.new(1, 0, 1, 0)}):Play()
-    task.wait(1)
+    TweenService:Create(LoadingBar, TweenInfo.new(0.7), {Size = UDim2.new(1, 0, 1, 0)}):Play()
+    task.wait(0.7)
+
+    -- Resize pets in Workspace
     for _, obj in ipairs(Workspace:GetDescendants()) do
-        if obj.Name == selectedPet and obj:IsA("Model") then
-            obj:SetPrimaryPartCFrame(obj.PrimaryPart.CFrame) -- refresh pos
-            obj.PrimaryPart.Size = Vector3.new(tonumber(KgBox.Text), tonumber(KgBox.Text), tonumber(KgBox.Text))
+        if obj.Name == selectedPet and obj:IsA("Model") and obj.PrimaryPart then
+            scaleModel(obj, kg)
+        end
+    end
+
+    -- Update pet data in Backpack
+    for _, obj in ipairs(LocalPlayer.Backpack:GetDescendants()) do
+        if obj.Name == selectedPet then
+            local kgValue = obj:FindFirstChild("Kg") or obj:FindFirstChild("Weight")
+            if kgValue and kgValue:IsA("NumberValue") then
+                kgValue.Value = kg
+            end
         end
     end
 end)
